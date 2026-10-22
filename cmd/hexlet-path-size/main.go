@@ -1,7 +1,9 @@
 package main
 
 import (
+	"code/code"
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -20,4 +22,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	path := "testdata/test.txt"
+	size, _ := code.GetPathSize(path)
+	fmt.Printf("%dB\t%s\n", size, path)
 }
