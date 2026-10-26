@@ -24,7 +24,7 @@ func main() {
 				return err
 			}
 
-			fmt.Printf("%s\t%s\n", size, path)
+			fmt.Printf("%d\t%s\n", size, path)
 			return nil
 		},
 	}
@@ -34,5 +34,3 @@ func main() {
 	}
 
 }
-
-//СДЕЛАТЬ КОММИТ!
