@@ -26,7 +26,7 @@ func GetPathSize(path string, recursive, human, all bool) (string, error) {
 		return sizeToHuman(size), nil
 	}
 
-	return fmt.Sprintf("%d", size), nil
+	return fmt.Sprintf("%dB", size), nil
 }
 
 func getSizeOfDir(path string, all bool, recursive bool) (int64, error) {
