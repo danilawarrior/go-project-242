@@ -60,15 +60,18 @@ func getSizeOfDir(path string, all bool, recursive bool) (int64, error) {
 
 func sizeToHuman(size int64) string {
 	units := []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
-	if size < 1000 {
+
+	if size < 1024 {
 		return fmt.Sprintf("%d%s", size, units[0])
 	}
 
 	sizeFloat := float64(size)
 	unitIndex := 0
-	for sizeFloat >= 1000 && unitIndex < len(units)-1 {
-		sizeFloat /= 1000
+
+	for sizeFloat >= 1024 && unitIndex < len(units)-1 {
+		sizeFloat /= 1024
 		unitIndex++
 	}
+
 	return fmt.Sprintf("%.1f%s", sizeFloat, units[unitIndex])
 }
