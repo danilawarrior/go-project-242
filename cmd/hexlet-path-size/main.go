@@ -39,6 +39,9 @@ func main() {
 			isAll := cmd.Bool("all")
 			isRecursive := cmd.Bool("recursive")
 
+			if cmd.NArg() != 1 {
+				return fmt.Errorf("exactly one path must be provided")
+			}
 			path := cmd.Args().First()
 			size, err := code.GetPathSize(path, isRecursive, isHuman, isAll)
 			if err != nil {
