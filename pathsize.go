@@ -8,28 +8,26 @@ import (
 )
 
 func GetPathSize(path string, recursive, human, all bool) (string, error) {
-	fileInfo, err := os.Lstat(path)
-	var size int64
-
+	size, err := getSize(path, recursive, all)
 	if err != nil {
 		return "", err
 	}
-	if fileInfo.IsDir() {
-		size, err = getSizeOfDir(path, all, recursive)
-	} else {
-		size = fileInfo.Size()
-	}
-	if err != nil {
-		return "", err
-	}
-	if human {
-		return sizeToHuman(size), nil
-	}
 
-	return fmt.Sprintf("%dB", size), nil
+	return formatSize(size, human), nil
 }
 
-func getSizeOfDir(path string, all bool, recursive bool) (int64, error) {
+func getSize(path string, recursive, all bool) (int64, error) {
+
+	//если path файл то вернуть его size
+	fileInfo, err := os.Lstat(path)
+
+	if err != nil {
+		return 0, err
+	}
+
+	if !fileInfo.IsDir() {
+		return fileInfo.Size(), nil
+	}
 
 	data, err := os.ReadDir(path)
 	if err != nil {
@@ -38,31 +36,36 @@ func getSizeOfDir(path string, all bool, recursive bool) (int64, error) {
 
 	var sizeOfDir int64
 	for _, entry := range data {
-		if !all && strings.HasPrefix(entry.Name(), ".") { //если флаг не задан и файл скрытый, то его не считаем.
+		if !all && strings.HasPrefix(entry.Name(), ".") {
 			continue
 		}
-		info, err := entry.Info()
+
+		entryPath := filepath.Join(path, entry.Name())
+
+		if entry.IsDir() && !recursive {
+			continue
+		}
+
+		size, err := getSize(entryPath, recursive, all)
 		if err != nil {
 			return 0, err
 		}
-		if !info.IsDir() {
-			sizeOfDir += info.Size()
-		} else if recursive {
-			sizeOfDirInside, err := getSizeOfDir(filepath.Join(path, info.Name()), all, recursive)
-			if err != nil {
-				return 0, err
-			}
-			sizeOfDir += sizeOfDirInside
-		}
+
+		sizeOfDir += size
 	}
 	return sizeOfDir, nil
+
 }
 
-func sizeToHuman(size int64) string {
+func formatSize(size int64, human bool) string {
+	if !human {
+		return fmt.Sprintf("%dB", size)
+	}
+
 	units := []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
 
 	if size < 1024 {
-		return fmt.Sprintf("%d%s", size, units[0])
+		return fmt.Sprintf("%dB", size)
 	}
 
 	sizeFloat := float64(size)
